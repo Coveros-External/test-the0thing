@@ -1,0 +1,25 @@
+# Add comment
+
+name: Do you like jokes?
+
+on:
+  issues:
+    types: [closed]
+  issue_comment:
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  Jokes-Are-Fun:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.0.0
+
+      # Check if the issue is the first issue (will have the label 'Welcome'), if it is we don't want to prompt on it as this is the setup issue
+      - if: ${{ !contains(github.event.issue.labels, 'Welcome') }}
+        name: Ask if they want to hear a joke
+        uses: ./.github/actions/tell-me-a-joke
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          openai-apikey: ${{ secrets.OPENAI_APIKEY }}

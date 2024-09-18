@@ -1,0 +1,12 @@
+name: "pass-variables-linux"
+description: "Test passing variables to a Linux action"
+inputs:
+  path:
+    description: "A variable to pass through"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Output Path
+      run: echo "${{ inputs.path }}"
+      shell: bash

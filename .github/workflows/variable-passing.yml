@@ -1,0 +1,74 @@
+name: Pass Some Variables
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux-variables:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.0.0
+
+      - name: Create env variable
+        run: |
+          echo "FILE_PATH=${{ github.workspace }}" >> "$GITHUB_ENV"
+
+      - name: Use Env Variable
+        run: |
+          echo "Using bash: $FILE_PATH"
+          echo "Using GH workflows: ${{ env.FILE_PATH }}"
+
+      - name: Send to action
+        uses: ./.github/actions/pass-variables-linux
+        with:
+          path: ${{ env.FILE_PATH }}
+
+      - name: Send to action 2
+        uses: ./.github/actions/pass-variables-linux
+        with:
+          path: $FILE_PATH
+
+  windows-variables:
+    runs-on: windows-latest
+    outputs:
+      file_path: ${{ steps.create_env.outputs.file_path }}
+      file_path2: ${{ steps.create_env.outputs.file_path2 }}
+    steps:
+      - uses: actions/checkout@v4.0.0
+
+      - name: Create env variable
+        id: create_env
+        shell: powershell
+        run: |
+          echo "FILE_PATH=${{ github.workspace }}" >> "$env:GITHUB_ENV"
+          echo "file_path=${{ github.workspace }}" >> "$env:GITHUB_OUTPUT"
+          $file_path2="${{ github.workspace }}/hahahaha"
+          echo "file_path2=$file_path2" >> "$env:GITHUB_OUTPUT"
+
+      - name: Use Env Variable
+        run: |
+          echo "Using bash: $env:FILE_PATH"
+          echo "Using GH workflows: $env:FILE_PATH"
+
+      - name: Send to action
+        uses: ./.github/actions/pass-variables-windows
+        with:
+          path: ${{ env.FILE_PATH }}
+
+      - name: Send to action 2
+        uses: ./.github/actions/pass-variables-windows
+        with:
+          path: $env:FILE_PATH
+
+
+  use-windows-variables:
+    runs-on: windows-latest
+    needs: windows-variables
+    steps:
+      - name: Echo the outputs
+        shell: powershell
+        run: |
+          echo "${{needs.windows-variables.outputs.file_path}}"
+          echo "${{needs.windows-variables.outputs.file_path2}}"
+
+

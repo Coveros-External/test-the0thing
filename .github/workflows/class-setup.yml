@@ -1,0 +1,61 @@
+# This workflow will get all of the commenters on a specified issue and invite them to join the repository.
+
+name: Class Setup
+
+on:
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  class-setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4.0.0
+
+      - name: Get the commenters
+        id: commenters
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            const response = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: "Welcome"
+            });
+
+            const commenters = response.data.map(issue => issue.user.login);
+
+            console.log(commenters);
+
+            core.setOutput("commenters", JSON.stringify(commenters));
+
+      - name: Invite commenters to the repository
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            const commenters = ${{ steps.commenters.outputs.commenters }};
+
+            for (const commenter of commenters) {
+              await github.rest.repos.addCollaborator({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                username: commenter,
+                permission: 'push'
+              });
+            }
+
+      # Once the invites have been sent out, make the repository private
+      - name: Make the repository private
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PAT }}
+          script: |
+            await github.rest.repos.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              private: true
+            });

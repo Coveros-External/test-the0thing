@@ -1,0 +1,23 @@
+name: "repo-name-compliance"
+description: Retrieve all repositories for the organization and check for naming compliance
+author: coveros-phil
+inputs:
+  token:
+    description: The token that has permissions to view all repositories for the organization
+    required: true
+  organization:
+    description: The organization to check
+    required: true
+  naming-convention:
+    description: The naming conventions to check for, must be a regex string
+    required: true
+  case-sensitive:
+    description: Whether or not the naming convention is case sensitive
+    required: false
+outputs:
+  repositories:
+    description: The repositories that are not compliant
+
+runs:
+  using: node16
+  main: "dist/index.js"

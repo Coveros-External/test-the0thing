@@ -1,0 +1,75 @@
+# This workflow will get all of the commenters on a specified issue and invite them to join the repository.
+
+name: Initialize Repository
+
+on:
+  create:
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  Initialize-Repository:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4.0.0
+
+      - name: Create the secret for the Personal Access Token
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createOrUpdateSecretForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              secret_name: 'PAT',
+            });
+
+      - name: Create the labels for the repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Welcome',
+              color: '0E8A16'
+            });
+            await github.rest.issues.createLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: '-_-',
+              color: 'F5C1E4'
+            });
+            await github.rest.issues.createLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Icebreaker',
+              color: '0052CC'
+            });
+            await github.rest.issues.createLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Jokes',
+              color: '8AF292'
+            });
+            await github.rest.issues.createLabel({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Too Spicy',
+              color: 'A95402'
+            });
+
+      - name: Create the first issue with the 'Welcome' label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'Add Your Comment',
+              body: 'In order to participate in the class most effectively you need to be part of the repository. Leave a comment here to do that.',
+              labels: ['Welcome']
+            });
+
+# TODO: Delete all of the stuff that we don't want in the repository

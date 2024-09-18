@@ -1,0 +1,31 @@
+name: Repository Naming Compliance
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   # Run every day at midnight
+  #   - cron: '0 0 * * *'
+
+jobs:
+  Repo-Check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.0.0
+    
+      - name: Check repo names
+        id: check
+        uses: ./.github/actions/repo-name-compliance
+        with:
+          token: ${{ secrets.PAT }}
+          organization: Coveros
+          naming-convention: '^github-'
+          case-sensitive: true
+
+      - name: Put output into file
+        run: echo ${{ toJSON(steps.check.outputs.repositories) }} > non-compliant-repositories.json
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: non-compliant-repositories
+          path: non-compliant-repositories.json
