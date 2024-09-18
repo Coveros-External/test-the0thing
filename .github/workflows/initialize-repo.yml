@@ -15,16 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4.0.0
 
-      - name: Create the secret for the Personal Access Token
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.actions.createOrUpdateSecretForRepo({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              secret_name: 'PAT',
-            });
-
       - name: Create the labels for the repository
         uses: actions/github-script@v7
         with:
