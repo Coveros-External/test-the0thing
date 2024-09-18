@@ -2,7 +2,7 @@ name: Class Attendee Participation
 description: Teaches you about GitHub issues and forms + enables your participation in the later labs
 title: "Please enter your name (make sure you delete all this text first)"
 labels: ["Icebreaker"]
-projects: ["Coveros-External/?"]
+projects: ["Coveros-External/6"]
 body:
   - type: markdown
     attributes:
